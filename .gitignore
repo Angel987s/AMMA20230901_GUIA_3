@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/AMMA20230901/Controllers/ProtetedController.cs
+/AMMA20230901/Controllers/TestController.cs
