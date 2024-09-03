@@ -1,53 +1,52 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace AMMA20230901.Controllers
 {
-    public class AccountController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AccountController : ControllerBase
     {
-        [HttpPost("login")]
-        public IActionResult Login(string login, string password)
+        // Simulación de una base de datos con usuarios y contraseñas
+        private static Dictionary<string, string> usuarios = new Dictionary<string, string>
         {
-            // Comprueba si las credenciales son válidas
-            if (login == "admin" && password == "12345")
+            {"estudiante1", "password1"},
+            {"profesor2", "password2"}
+        };
+
+        [HttpPost("login")]
+        public IActionResult Login(string username, string password)
+        {
+            // Validación de credenciales contra la base de datos simulada
+            if (usuarios.TryGetValue(username, out var storedPassword) && storedPassword == password)
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, login)
+                    new Claim(ClaimTypes.Name, username)
                 };
-                var claimsIdentity = new ClaimsIdentity(claims,
-                    CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    // Puedes configurar propiedades adicionales aquí
-                    // Por ejemplo, para hacer que la cookie persista:
-                    IsPersistent = true,
-                    // Para especificar una fecha de expiración:
-                    ExpiresUtc = DateTime.UtcNow.AddDays(7)
-                };
-                // Inicia sesión del usuario
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties();
+
                 HttpContext.SignInAsync(
-                   CookieAuthenticationDefaults.AuthenticationScheme,
-                   new ClaimsPrincipal(claimsIdentity), authProperties);
-                return Ok("Inició sesión correctamente.");
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                return Ok("Inicio de sesión exitoso.");
             }
             else
             {
-                return Ok("Credenciales Incorrectas.");
-
+                return Unauthorized("Credenciales inválidas.");
             }
         }
+
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            // Cierra la sesión del usuarios
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Devuelve una respuesta exitosa
-            return Ok("Cerró sesión correctamente.");
+            return Ok("Cierre de sesión exitoso.");
         }
     }
 }

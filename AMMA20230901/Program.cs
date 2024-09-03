@@ -14,7 +14,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         // Configura el nombre del parámetro de URL para redireccionamiento no autorizado
         options.ReturnUrlParameter = "unauthorized";
-
         options.Events = new CookieAuthenticationEvents
         {
             OnRedirectToLogin = context =>
@@ -50,9 +49,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
